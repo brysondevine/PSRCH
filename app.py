@@ -12,8 +12,16 @@ parts_df = load_parts()
 st.title("Part Number Checker")
 part_input = st.text_input("Enter Part Number").strip()
 
-if part_input:
-    if part_input.upper() in parts_df["Part Number"].astype(str).str.upper().values:
-        st.success("✅ Commodity Is Correct")
+if "Part Number" in parts_df.columns:
+    # Make everything uppercase for case-insensitive matching
+    parts_df["Part Number"] = parts_df["Part Number"].astype(str).str.upper()
+    input_upper = part_input.upper()
+
+    if input_upper in parts_df["Part Number"].values:
+        matched_row = parts_df[parts_df["Part Number"] == input_upper].iloc[0]
+        part_name = matched_row["Part Name"]
+        st.success(f"✅ {input_upper} is correct – {part_name}")
     else:
         st.error("❌ Part Number Not Found")
+else:
+    st.error("🚨 'Part Number' column missing from parts_list.csv")
